@@ -15,3 +15,4 @@ django-allauth
 pillow==10.3.0
 PyMySQL==1.1.0
 tzdata
+requests

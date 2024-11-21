@@ -15,8 +15,8 @@ class House(models.Model):
 
     houseworkId = models.AutoField(primary_key=True)
     houseworkDate = models.DateField('date published', auto_now_add=True)
-    houseworkPlace = models.CharField(max_length=100, Null=True)
-    houseworkDetail = models.CharField(max_length=100, Null=True)
+    houseworkPlace = models.CharField(max_length=100, null=True)
+    houseworkDetail = models.CharField(max_length=100, null=True)
     houseworkDone = models.BooleanField(default=True)
 
     def __str__(self):
