@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import User, House
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -80,4 +81,10 @@ class KakaoLoginSerializer(serializers.Serializer):
                 return data
         else:
             raise serializers.ValidationError('존재하지 않는 사용자입니다.')
-        
+
+class UserHouseworkSerializer(serializers.Serializer):
+    userid = serializers.IntegerField(source="id", read_only=True )
+
+    class Meta:
+        model=User
+        fields=['userid', 'nickname', 'userCharacter']

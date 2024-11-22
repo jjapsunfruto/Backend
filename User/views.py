@@ -28,7 +28,7 @@ class KakaoLoginCallbackView(views.APIView):
             return JsonResponse({"message": "코드가 제공되지 않았습니다."}, status=400)
 
         client_id = os.environ.get('KAKAO_CLIENT_ID')
-        redirect_uri = f"{KAKAO_BASE_URL}//user/login/kakao/callback/"
+        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
 
         token_request = requests.get(
             f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
@@ -38,7 +38,7 @@ class KakaoLoginCallbackView(views.APIView):
         logging.info(f"Kakao token response: {token_json}")
 
         if token_request.status_code != 200 or "access_token" not in token_json:
-            return JsonResponse({"message": "INVALID_CODE"}, status=400)
+            return JsonResponse({"message": "유효하지 않은 코드입니다."}, status=400)
 
         access_token = token_json["access_token"]
 
