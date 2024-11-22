@@ -14,6 +14,7 @@ class HouseworkTagSerializer(serializers.Serializer):
 class HouseworkSerializer(serializers.ModelSerializer):
     user=UserHouseworkSerializer(read_only=True)
     tag=HouseworkTagSerializer(read_only=True)
+    houseworkDone=False
 
     class Meta:
         model = Housework

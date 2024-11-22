@@ -18,7 +18,7 @@ class Housework(models.Model):
     houseworkDate = models.DateField('date published', auto_now_add=True)
     houseworkPlace = models.CharField(max_length=100, blank=True, null=True)
     houseworkDetail = models.CharField(max_length=100, blank=True, null=True)
-    houseworkDone = models.BooleanField(default=False, blank=True, null=True)
+    houseworkDone = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user}가 {self.houseworkPlace}에서 {self.houseworkDetail}"
+        return f"{self.user}이(가) {self.houseworkPlace}에서 {self.houseworkDetail}"
