@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     'Housework',
     'User',
+    'calendarapp',
 ]
 
 SITE_ID = 1
