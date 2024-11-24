@@ -1,12 +1,31 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from rest_framework import views, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
+
 
 import os, requests, logging
 
 from .models import *
 from .serializers import *
+
+class HouseCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        housename = request.data.get('housename')
+        house = House.objects.create(housename=housename)
+
+        user.house.add(house)
+        response_data = {
+            'houseid' : house.id,
+            'housename' : house.housename,
+            'housecode' : house.housecode
+        }
+        return Response({'message':'house 생성', 'data':response_data}, status=status.HTTP_201_CREATED)
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
