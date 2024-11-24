@@ -26,6 +26,28 @@ class NicknameCreateView(views.APIView):
             'message': 'User의 nickname update 성공', 
             'user': serializer.data})
 
+class HouseInputView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        housecode = request.data.get('housecode')
+        user.house = House.objects.get(housecode=housecode)
+        user.save()
+
+        serializer = UserHouseworkSerializer(user)
+        house = user.house
+        response_data = {
+            'houseid' : house.id,
+            'housename' : house.housename,
+            'housecode' : house.housecode
+        }
+
+        return Response({'message':'house 추가', 
+                         'user':serializer.data,
+                         'house':response_data
+                         }, status=200)
+
 class HouseCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
 
