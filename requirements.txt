@@ -16,3 +16,6 @@ pillow==10.3.0
 PyMySQL==1.1.0
 tzdata
 requests
+
+# ChatGPT API 연결 위한 설치 추가
+openai
