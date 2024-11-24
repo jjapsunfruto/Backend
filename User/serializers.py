@@ -82,7 +82,7 @@ class KakaoLoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError('존재하지 않는 사용자입니다.')
 
-class UserHouseworkSerializer(serializers.Serializer):
+class UserHouseworkSerializer(serializers.ModelSerializer):
     userid = serializers.IntegerField(source="id", read_only=True )
 
     class Meta:

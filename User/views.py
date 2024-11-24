@@ -1,12 +1,84 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from rest_framework import views, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
+
 
 import os, requests, logging
 
 from .models import *
 from .serializers import *
+
+class NicknameCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        new_nickname = request.data.get('nickname')
+        user.nickname = new_nickname
+        user.save() 
+
+        serializer = UserHouseworkSerializer(user)
+
+        return Response({
+            'message': 'User의 nickname update 성공', 
+            'user': serializer.data})
+
+class HouseInputView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        housecode = request.data.get('housecode')
+        user.house = House.objects.get(housecode=housecode)
+        user.save()
+
+        serializer = UserHouseworkSerializer(user)
+        house = user.house
+        response_data = {
+            'houseid' : house.id,
+            'housename' : house.housename,
+            'housecode' : house.housecode
+        }
+
+        return Response({'message':'house 추가', 
+                         'user':serializer.data,
+                         'house':response_data
+                         }, status=200)
+
+class HouseCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        housename = request.data.get('housename')
+        house = House.objects.create(housename=housename)
+
+        user.house = house
+        user.save()
+        response_data = {
+            'houseid' : house.id,
+            'housename' : house.housename,
+            'housecode' : house.housecode
+        }
+        return Response({'message':'house 생성', 'data':response_data}, status=status.HTTP_201_CREATED)
+
+class CharacterCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        new_character = request.data.get('character')
+        user.userCharacter = new_character
+        user.save() 
+
+        serializer = UserHouseworkSerializer(user)
+
+        return Response({
+            'message': 'User의 character update 성공', 
+            'user': serializer.data})
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
@@ -70,4 +142,9 @@ class KakaoLoginCallbackView(views.APIView):
 
         token = AccessToken.for_user(user)
 
-        return JsonResponse({"token": str(token)}, status=200)
+        return JsonResponse({
+            "user": {
+            "id": user.id,
+            "nickname": user.nickname
+            },
+            "token": str(token)}, status=200)

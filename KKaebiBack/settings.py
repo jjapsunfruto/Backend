@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'User',
     'calendarapp',
     'home',
+    'mypage',
 ]
 
 SITE_ID = 1
