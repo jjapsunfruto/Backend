@@ -11,6 +11,21 @@ import os, requests, logging
 from .models import *
 from .serializers import *
 
+class NicknameModifyView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        new_nickname = request.data.get('nickname')
+        user.nickname = new_nickname
+        user.save() 
+
+        serializer = UserHouseworkSerializer(user)
+
+        return Response({
+            'message': 'User의 nickname update 성공', 
+            'user': serializer.data})
+
 class HouseCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
 
@@ -89,4 +104,9 @@ class KakaoLoginCallbackView(views.APIView):
 
         token = AccessToken.for_user(user)
 
-        return JsonResponse({"token": str(token)}, status=200)
+        return JsonResponse({
+            "user": {
+            "id": user.id,
+            "nickname": user.nickname
+            },
+            "token": str(token)}, status=200)
