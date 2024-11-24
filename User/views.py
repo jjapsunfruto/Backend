@@ -11,7 +11,7 @@ import os, requests, logging
 from .models import *
 from .serializers import *
 
-class NicknameModifyView(views.APIView):
+class NicknameCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
@@ -34,13 +34,29 @@ class HouseCreateView(views.APIView):
         housename = request.data.get('housename')
         house = House.objects.create(housename=housename)
 
-        user.house.add(house)
+        user.house = house
+        user.save()
         response_data = {
             'houseid' : house.id,
             'housename' : house.housename,
             'housecode' : house.housecode
         }
         return Response({'message':'house 생성', 'data':response_data}, status=status.HTTP_201_CREATED)
+
+class CharacterCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        new_character = request.data.get('character')
+        user.userCharacter = new_character
+        user.save() 
+
+        serializer = UserHouseworkSerializer(user)
+
+        return Response({
+            'message': 'User의 character update 성공', 
+            'user': serializer.data})
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
