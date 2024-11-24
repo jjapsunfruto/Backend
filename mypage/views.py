@@ -50,10 +50,14 @@ class RemoveMemberView(views.APIView):
     def delete(self, request):
         serializer = RemoveMemberSerializer(data=request.data)
         if serializer.is_valid():
-            user_id = serializer.validated_data.get('user_id')
+            userid = serializer.validated_data.get('userid')
+
+            if not userid:
+                return Response({"error": "userid가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
 
             try:
-                user_to_remove = User.objects.get(id=user_id)
+                user_to_remove = User.objects.get(id=userid)
                 house = request.user.house
 
                 if user_to_remove.house == house:
