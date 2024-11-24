@@ -6,14 +6,15 @@ from .models import User, House
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id', 'username', 'password', 'nickname']
+        fields=['id', 'username', 'password', 'nickname', 'plan']
 
     def create(self, validated_data):  
         user = User.objects.create(
             username=validated_data['username'],
             nickname=validated_data['nickname'],
             userCharacter=validated_data['userCharacter'],
-            house=validated_data['house']
+            house=validated_data['house'],
+            plan = validated_data['plan'],
         )
         user.set_password(validated_data['password'])
         user.save()
