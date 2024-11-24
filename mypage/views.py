@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from User.models import User, House
+from Housework.models import *
 from .serializers import UserInfoSerializer, HouseInfoSerializer, HouseMemberSerializer, RemoveMemberSerializer
 # Create your views here.
 
@@ -82,3 +83,16 @@ class UpgradePlanView(views.APIView):
         user.plan = User.PREMIUM
         user.save()
         return Response({"message": "프리미엄형 요금제로 변경되었습니다."}, status=status.HTTP_200_OK)
+    
+class RemoveAccountView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+
+        try:
+            user.delete()
+            return Response({"message": "계정이 성공적으로 삭제되었습니다."}, status=status.HTTP_200_OK)
+        
+        except Exception:
+            return Response({"error": "계정 삭제 중 오류가 발생했습니다."}, status=status.HTTP_400_BAD_REQUEST)
