@@ -54,7 +54,6 @@ class RemoveMemberView(views.APIView):
 
             if not userid:
                 return Response({"error": "userid가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
-        
 
             try:
                 user_to_remove = User.objects.get(id=userid)
@@ -70,3 +69,16 @@ class RemoveMemberView(views.APIView):
             except User.DoesNotExist:
                 return Response({"error": "찾을 수 없는 사용자입니다."}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UpgradePlanView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+
+        if user.plan == User.PREMIUM:
+            return Response({"message": "이미 프리미엄 요금제입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.plan = User.PREMIUM
+        user.save()
+        return Response({"message": "프리미엄형 요금제로 변경되었습니다."}, status=status.HTTP_200_OK)
