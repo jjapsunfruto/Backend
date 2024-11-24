@@ -23,7 +23,8 @@ class HouseworkPostView(views.APIView):
             housework_tag = get_object_or_404(HouseworkTag, id=tag_id)
             serializer.save(user=request.user, tag=housework_tag)
             return Response({'message':'Housework post 성공', 'data':serializer.data}, status=status.HTTP_201_CREATED)
-        return Response({'messange':'Housework post 실패', 'error':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message':'Housework post 실패', 'error':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # OpenAI
 client = OpenAI(
