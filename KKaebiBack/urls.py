@@ -25,4 +25,5 @@ urlpatterns = [
     path('housework/', include('Housework.urls')),
     path('calendarapp/', include('calendarapp.urls')),
     path('home/', include('home.urls')),
+    path('mypage/', include('mypage.urls')),
 ] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
