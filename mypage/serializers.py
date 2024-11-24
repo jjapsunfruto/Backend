@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from User.models import User,House
+from User.models import User, House
 
 class UserInfoSerializer(serializers.ModelSerializer):
     userid = serializers.IntegerField(source="id", read_only=True)
@@ -10,11 +10,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields=['userid', 'nickname', 'userCharacter']
 
 class HouseInfoSerializer(serializers.ModelSerializer):
-    housecode = serializers.IntegerField()
-
+    #housecode = serializers.IntegerField()
     class Meta:
         model=House
-        fields=['housecode']
+        fields=['housename', 'housecode']
 
 class HouseMemberSerializer(serializers.ModelSerializer):
     userid = serializers.IntegerField(source="id", read_only=True)

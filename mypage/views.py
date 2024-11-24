@@ -36,10 +36,10 @@ class HouseMemberInfoView(views.APIView):
             user = request.user
             house = user.house
 
-            members = house.members.all()
+            members = house.users_house.all()
 
             serializer = HouseMemberSerializer(members, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"housemembers" : serializer.data}, status=status.HTTP_200_OK)
         
         except AttributeError:
             return Response({"error": "사용자가 속한 집의 식구 정보가 없습니다."}, status=status.HTTP_404_NOT_FOUND)

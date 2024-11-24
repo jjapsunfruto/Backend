@@ -19,7 +19,8 @@ class House(models.Model):
 class User(AbstractUser):
     nickname=models.CharField(max_length=8)
     userCharacter=models.IntegerField(default=1)
-    house = models.ManyToManyField(House, related_name='house')
+    house = models.ForeignKey(House, on_delete=models.CASCADE, 
+                              null=True, blank=True, related_name='users_house')
     
     def __str__(self):
         return f"{self.nickname}"

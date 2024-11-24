@@ -34,7 +34,8 @@ class HouseCreateView(views.APIView):
         housename = request.data.get('housename')
         house = House.objects.create(housename=housename)
 
-        user.house.add(house)
+        user.house = house
+        user.save()
         response_data = {
             'houseid' : house.id,
             'housename' : house.housename,
