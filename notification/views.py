@@ -15,7 +15,7 @@ class NotificationListView(APIView):
                 "message" : notification.message,
                 "time": notification.time_since_created()
             }
-            for notification in Notification
+            for notification in notifications
         ]
 
         return Response({"notifications" : notification_data}, status=200)

@@ -3,6 +3,6 @@ from .views import NotificationListView
 
 app_name = 'notification'
 
-urlpatters = [
+urlpatterns = [
     path('list/', NotificationListView.as_view(), name='notification-list'),
 ]
