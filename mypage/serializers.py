@@ -23,4 +23,7 @@ class HouseMemberSerializer(serializers.ModelSerializer):
         fields = ['userid', 'nickname', 'userCharacter']
 
 class RemoveMemberSerializer(serializers.Serializer):
-    userid = serializers.IntegerField(source="id", read_only=True)
+    userid = serializers.IntegerField()
+
+    class Meta:
+        fields = ['userid']

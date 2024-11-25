@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from User.models import User, House
+from Housework.models import *
 from .serializers import UserInfoSerializer, HouseInfoSerializer, HouseMemberSerializer, RemoveMemberSerializer
 # Create your views here.
 
@@ -50,10 +51,13 @@ class RemoveMemberView(views.APIView):
     def delete(self, request):
         serializer = RemoveMemberSerializer(data=request.data)
         if serializer.is_valid():
-            user_id = serializer.validated_data.get('user_id')
+            userid = serializer.validated_data.get('userid')
+
+            if not userid:
+                return Response({"error": "userid가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
-                user_to_remove = User.objects.get(id=user_id)
+                user_to_remove = User.objects.get(id=userid)
                 house = request.user.house
 
                 if user_to_remove.house == house:
@@ -66,3 +70,29 @@ class RemoveMemberView(views.APIView):
             except User.DoesNotExist:
                 return Response({"error": "찾을 수 없는 사용자입니다."}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UpgradePlanView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+
+        if user.plan == User.PREMIUM:
+            return Response({"message": "이미 프리미엄 요금제입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.plan = User.PREMIUM
+        user.save()
+        return Response({"message": "프리미엄형 요금제로 변경되었습니다."}, status=status.HTTP_200_OK)
+    
+class RemoveAccountView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+
+        try:
+            user.delete()
+            return Response({"message": "계정이 성공적으로 삭제되었습니다."}, status=status.HTTP_200_OK)
+        
+        except Exception:
+            return Response({"error": "계정 삭제 중 오류가 발생했습니다."}, status=status.HTTP_400_BAD_REQUEST)

@@ -8,4 +8,6 @@ urlpatterns = [
     path('house/', HouseInfoView.as_view()),
     path('member/', HouseMemberInfoView.as_view()),
     path('remove-member/', RemoveMemberView.as_view()),
+    path('plan-upgrade/', UpgradePlanView.as_view()),
+    path('remove-account/', RemoveAccountView.as_view()),
 ]
