@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from User.models import User
-from .models import Housework, HouseworkTag
+from User.models import User, HouseworkTag
+from .models import Housework
 from User.serializers import UserHouseworkSerializer
 
 class HouseworkTagSerializer(serializers.Serializer):

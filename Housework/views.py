@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.decorators import login_required
 
-from .models import HouseworkTag, Housework
+from .models import Housework
 from User.models import *
 from calendarapp.models import CalendarEvent
 from .serializers import HouseworkSerializer
