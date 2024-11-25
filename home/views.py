@@ -8,15 +8,6 @@ from User.models import User, House
 from Housework.models import Housework
 
 
-from KKaebiBack.utils import calculate_level
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from User.models import User
-from Housework.models import Housework
-
-
 class HomeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -108,3 +99,36 @@ class FamilyView(APIView):
             },
             "family": family_info
         }, status=200)
+    
+
+
+class DistributionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        house = user.house
+
+        houseworks = Housework.objects.filter(user__house=house)
+        total_house_tasks = houseworks.count()
+
+        #구성원별 분배 비율 계산
+        members = User.objects.filter(house=house)
+        distribution = []
+        for member in members:
+            member_tasks = houseworks.filter(user=member).count()
+            distribution_percentage = (
+                int((member_tasks / total_house_tasks * 100))
+                if total_house_tasks > 0 else 0
+            )
+            distribution.append({
+                "nickname":member.nickname,
+                "total_tasks":member_tasks,
+                "distribution_percentage": f"{distribution_percentage}%"
+            })
+
+        return Response({
+            "house" : house.housename,
+            "total_house_tasks": total_house_tasks,
+            "distribution":distribution
+        }, status = 200)
