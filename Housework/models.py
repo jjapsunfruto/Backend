@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from User.models import User
+from calendarapp.models import CalendarEvent
 
 class HouseworkTag(models.Model):
     tag = models.CharField(max_length=100)

@@ -3,13 +3,16 @@ from rest_framework import views, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.decorators import login_required
 
-from .models import HouseworkTag
+from .models import HouseworkTag, Housework
+from User.models import *
+from calendarapp.models import CalendarEvent
 from .serializers import HouseworkSerializer
 
 import os
+from datetime import datetime
 from openai import OpenAI
-from django.conf import settings
 from django.http import JsonResponse
 
 class HouseworkPostView(views.APIView):
@@ -31,17 +34,38 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-def chat_with_gpt(request):
-    user_input = request.GET.get('message', '')
 
-    if not user_input:
+def recommend_tag_with_chatgpt(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "인증된 사용자가 아닙니다."}, status=401)
+
+    if request.user.plan != 'premium':
+        return JsonResponse({"error": "AI 추천 기능은 프리미엄 요금제를 결제해야 사용할 수 있습니다."}, status=403)
+
+    user_input = request.GET.get('message', '')
+    date_str = request.GET.get('date', '').strip()
+
+    if not user_input or not date_str:
         return JsonResponse({"error": "No message provided"}, status=400)
     
+    housework_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    day_of_week = housework_date.weekday()
+    housework_entries = Housework.objects.filter(houseworkDate=housework_date)
+    tags = [entry.tag.tag for entry in housework_entries if entry.tag]
+
+    if not tags:
+        return response({"error": "지정된 집안일 태그가 없습니다."}, status=400)
+
+    prompt = f"The following are the housework tags performed on {housework_date} ({housework_date.strftime('%A')}):\n"
+    prompt += "\n".join(tags)
+    prompt += "\nBased on the above list of tags, what is the most frequent tag? Please give only the tag and no extra explanation."
+
+
     try:
         # OpenAI API 호출
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": user_input}],
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=150,
             temperature=0
         )
