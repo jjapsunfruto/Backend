@@ -10,7 +10,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields=['userid', 'nickname', 'userCharacter']
 
 class HouseInfoSerializer(serializers.ModelSerializer):
-    #housecode = serializers.IntegerField()
     class Meta:
         model=House
         fields=['housename', 'housecode']

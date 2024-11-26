@@ -10,6 +10,7 @@ import os, requests, logging
 
 from .models import *
 from .serializers import *
+from Housework.serializers import HouseworkTagSerializer
 
 class NicknameCreateView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -79,6 +80,40 @@ class CharacterCreateView(views.APIView):
         return Response({
             'message': 'User의 character update 성공', 
             'user': serializer.data})
+
+class HouseworkTagCreateView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user= request.user
+        houseworkTag = request.data.get('houseworkTag')
+
+        try:
+            if isinstance(houseworkTag, str):
+                houseworkTag = list(map(int, houseworkTag.split(',')))
+        except:
+            return Response({'error': "houseworkTag가 제공되지 않았습니다."})
+        
+        serializer = UserHouseworkSerializer(
+            user, 
+            data={'houseworkTag': houseworkTag}, 
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({
+            'message': 'User의 houseworkTag update 성공',
+            'user': serializer.data
+            }, status=status.HTTP_200_OK)
+    
+        return Response({
+            'message': 'User의 houseworkTag update 실패',
+            'error': serializer.error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"

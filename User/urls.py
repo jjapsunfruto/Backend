@@ -11,5 +11,6 @@ urlpatterns = [
 
     path('create/nickname/', NicknameCreateView.as_view()),
     path('create/house/', HouseCreateView.as_view()),
-    path('create/character/', CharacterCreateView.as_view())
+    path('create/character/', CharacterCreateView.as_view()),
+    path('create/houseworktag/', HouseworkTagCreateView.as_view())
 ]

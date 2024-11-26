@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_auth.registration',
 
+    #websocket
+    'channels',
+
     # providers
     'allauth.socialaccount.providers.kakao',  
     
@@ -183,3 +186,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 KAKAO_CLIENT_ID =  env('KAKAO_CLIENT_ID')
 KAKAO_SECRET = env('KAKAO_SECRET')
 KAKAO_BASE_URL = env('KAKAO_BASE_URL')
+
+#Websocket
+ASGI_APPLICATION = 'KKaebiBack.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

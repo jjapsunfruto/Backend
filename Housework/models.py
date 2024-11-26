@@ -1,13 +1,8 @@
 from django.db import models
 from django.conf import settings
 
-from User.models import User
-
-class HouseworkTag(models.Model):
-    tag = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.tag}"
+from User.models import User, HouseworkTag
+from calendarapp.models import CalendarEvent
 
 class Housework(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
