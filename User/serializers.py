@@ -92,3 +92,10 @@ class UserHouseworkSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=['userid', 'nickname', 'houseworkTag']
+
+class UserListSerailizer(serializers.ModelSerializer):
+    userid = serializers.IntegerField(source="id", read_only=True)
+    
+    class Meta:
+        model=User
+        fields=['userid', 'nickname', 'userCharacter']

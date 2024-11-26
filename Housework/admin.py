@@ -5,7 +5,7 @@ from User.models import HouseworkTag
 # Register your models here.
 @admin.register(Housework)
 class HouseworkAdmin(admin.ModelAdmin):
-    list_display = ('user', 'tag', 'houseworkPlace', 'houseworkDetail', 'houseworkDone')
+    list_display = ('houseworkId', 'user', 'tag', 'houseworkPlace', 'houseworkDetail', 'houseworkDone')
     list_filter = ('houseworkDone', 'tag')
     search_fields = ('houseworkPlace', 'houseworkDetail')
 
