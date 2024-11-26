@@ -33,6 +33,7 @@ class HomeView(APIView):
         response_data = {
             "house": housename,
             "nickname": user.nickname,
+            "userCharacter": user.userCharacter,
             "tasks": {
                 "today_completion_rate": f"{today_completion_rate}%",
                 "weekly_completion_rate": f"{weekly_completion_rate}%",
