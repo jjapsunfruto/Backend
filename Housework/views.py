@@ -50,13 +50,13 @@ def recommend_tag_with_chatgpt(request):
     
     housework_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     day_of_week = housework_date.weekday()
-    housework_entries = Housework.objects.filter(houseworkDate=housework_date)
+    housework_entries = Housework.objects.filter(houseworkDate__weekday=day_of_week)
     tags = [entry.tag.tag for entry in housework_entries if entry.tag]
 
     if not tags:
         return response({"error": "지정된 집안일 태그가 없습니다."}, status=400)
 
-    prompt = f"The following are the housework tags performed on {housework_date} ({housework_date.strftime('%A')}):\n"
+    prompt = f"The following are the housework tags performed on {housework_date.strftime('%A')}:"
     prompt += "\n".join(tags)
     prompt += "\nBased on the above list of tags, what is the most frequent tag? Please give only the tag and no extra explanation."
 
