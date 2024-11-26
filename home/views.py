@@ -26,6 +26,10 @@ class HomeView(APIView):
         weekly_completion_rate = calculate_weekly_completion_rate(user)
         level = calculate_level(weekly_completion_rate)
 
+        selected_tags = user.houseworkTag.all()
+        tags_info = [{"id": tag.id, "name": tag.tag} for tag in selected_tags]
+
+
         response_data = {
             "house": housename,
             "nickname": user.nickname,
@@ -33,7 +37,8 @@ class HomeView(APIView):
                 "today_completion_rate": f"{today_completion_rate}%",
                 "weekly_completion_rate": f"{weekly_completion_rate}%",
                 "level": level
-            }
+            },
+            "selected_tags": tags_info,
         }
         return Response(response_data, status=200)
 
