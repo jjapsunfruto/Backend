@@ -9,7 +9,7 @@ from .models import Housework
 from User.models import *
 from calendarapp.models import CalendarEvent
 from .serializers import HouseworkSerializer
-from User.serializers import UserListSerailizer
+from User.serializers import UserListSerializer
 
 import os
 from datetime import datetime
@@ -37,7 +37,7 @@ class HomeworkUserPostView(views.APIView):
         house=House.objects.get(id=user.house.id)
 
         housemember=User.objects.filter(house=house)
-        serializer = UserListSerailizer(housemember, many=True)
+        serializer = UserListSerializer(housemember, many=True)
 
         return Response({
             'message': 'UserList get 성공',

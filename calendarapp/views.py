@@ -1,9 +1,12 @@
+from User.models import House, User
 from Housework.models import Housework
-from Housework.serializers import HouseworkSerializer
+from Housework.serializers import HouseworkSerializer, CalendarHouseworkSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
+from datetime import date
 
 
 class CalendarView(APIView):
@@ -42,3 +45,38 @@ class HouseworkDoneView(APIView):
                 'message': "집안일 완료 상태 변경 완료",
                 'data': serializer.data
             })
+
+class HouseworkMyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, year, month, day):
+        user=request.user
+
+        target_date = date(year, month, day)
+        housework=Housework.objects.filter(user=user, houseworkDate=target_date)
+
+        serializer = CalendarHouseworkSerializer(housework, many=True)
+
+        return Response({
+            'message': "나의 할일 get",
+            'data': serializer.data
+        })
+
+class HouseworkFamilyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, year, month, day):
+        user=request.user
+        house=House.objects.get(id=user.house.id)
+
+        housemember=User.objects.filter(house=house).exclude(id=user.id)
+
+        target_date = date(year, month, day)
+        housework=Housework.objects.filter(user__in=housemember, houseworkDate=target_date)
+
+        serializer = CalendarHouseworkSerializer(housework, many=True)
+
+        return Response({
+            'message': "식구들의 할일 get",
+            'data': serializer.data
+        })
