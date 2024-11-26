@@ -6,5 +6,6 @@ app_name = 'housework'
 urlpatterns = [
     path('posting/', HouseworkPostView.as_view()),
     path('manager/', HomeworkUserPostView.as_view()),
-    path('recommend-tag/', RecommendTagByChatGPTView.as_view(), name='recommend_tag_with_chatgpt'),
+    path('recommend-tag/', RecommendTagByChatGPTView.as_view()),
+    path('recommend-member/', RecommendMemberByChatGPTView.as_view()),
 ]

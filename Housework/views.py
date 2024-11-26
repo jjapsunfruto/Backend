@@ -110,7 +110,60 @@ class RecommendTagByChatGPTView(views.APIView):
         prompt += "\nBased on the above list of tags, what is the most frequent tag? Please give only the tag and no extra explanation."
 
         try:
-            # OpenAI API 호출
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=150,
+                temperature=0
+            )
+            
+        
+            chatgpt_response = response.choices[0].message.content
+            return JsonResponse({"response": chatgpt_response})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+class RecommendMemberByChatGPTView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.plan != "premium":
+            return JsonResponse({"error": "AI 추천 기능은 프리미엄 요금제를 결제해야 사용할 수 있습니다."}, status=403)
+        
+        user = request.user
+
+        housework_id = request.GET.get('houseworkId')
+
+        if not housework_id:
+            return JsonResponse({"error": "houseworkId가 필요합니다."}, status=400)
+
+        housework = get_object_or_404(Housework, houseworkId=housework_id)
+        
+        housework_tag = housework.tag
+        if not housework_tag:
+            return JsonResponse({"error": "집안일에 태그가 지정되지 않았습니다."}, status=400)
+
+        house = user.house
+        if not house:
+            return JsonResponse({"error": "사용자의 집 정보가 없습니다."}, status=400)
+        
+        house_members = User.objects.filter(house=house).exclude(id=user.id)
+
+        users_list = []
+        for member in house_members:
+            member_tags = member.houseworkTag.all()
+            users_list.append({
+                "userid": member.id,
+                "tags": [tag.tag for tag in member_tags]
+            })
+
+        prompt = f"Below are the users whose tags match the housework tag.\n" \
+         f"Housework Tag: {housework_tag.tag}\n" \
+         f"Users to recommend:\n{users_list}\n" \
+         f"Please recommend the most suitable person to take care of this housework from the list above. Only return the ID of the recommended person."
+
+        try:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],
