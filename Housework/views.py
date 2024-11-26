@@ -5,10 +5,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.decorators import login_required
 
-from .models import HouseworkTag, Housework
+from .models import Housework
 from User.models import *
 from calendarapp.models import CalendarEvent
 from .serializers import HouseworkSerializer
+from User.serializers import UserListSerializer
 
 import os
 from datetime import datetime
@@ -24,9 +25,52 @@ class HouseworkPostView(views.APIView):
         if serializer.is_valid():
             tag_id = request.data.get('tag')
             housework_tag = get_object_or_404(HouseworkTag, id=tag_id)
-            serializer.save(user=request.user, tag=housework_tag)
+            serializer.save(tag=housework_tag)
             return Response({'message':'Housework post 성공', 'data':serializer.data}, status=status.HTTP_201_CREATED)
         return Response({'message':'Housework post 실패', 'error':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class HomeworkUserPostView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user=request.user
+        house=House.objects.get(id=user.house.id)
+
+        housemember=User.objects.filter(house=house)
+        serializer = UserListSerializer(housemember, many=True)
+
+        return Response({
+            'message': 'UserList get 성공',
+            'data': {
+                'housename': house.housename,
+                'housemember': serializer.data
+            }
+        })
+
+    def put(self, request, format=None):
+        housework_id = request.data.get('houseworkId')
+        manager = request.data.get('housework_manager')
+
+        try:
+            housework = Housework.objects.get(houseworkId=housework_id)
+            user = User.objects.get(id=manager)
+
+            housework.user = user
+            housework.save()
+
+            serializer = HouseworkSerializer(housework)
+
+            return Response({
+                'message': 'Housework manager put 성공',
+                'data': serializer.data
+            }, status=200)
+
+        except Housework.DoesNotExist:
+            return Response({'message': '해당 housework를 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({'message': '해당 user를 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Housework manager put 실패', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # OpenAI

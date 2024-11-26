@@ -16,6 +16,12 @@ class House(models.Model):
     def __str__(self):
         return f"{self.housename}"
 
+class HouseworkTag(models.Model):
+    tag = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.tag}"
+
 class User(AbstractUser):
     BASIC = 'basic'
     PREMIUM = 'premium'
@@ -29,7 +35,13 @@ class User(AbstractUser):
     userCharacter=models.IntegerField(default=1)
     house = models.ForeignKey(House, on_delete=models.CASCADE, 
                               null=True, blank=True, related_name='users_house')
+    houseworkTag = models.ManyToManyField(HouseworkTag, related_name='users_houseworktag', blank=True)
     plan = models.CharField(max_length=10, choices=PLAN_CHOICES, default=BASIC)
+    
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.nickname
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.nickname}"
