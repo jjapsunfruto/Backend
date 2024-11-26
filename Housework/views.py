@@ -77,7 +77,7 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-class RecommendByChatGPTView(views.APIView):
+class RecommendTagByChatGPTView(views.APIView):
     permission_classes = [IsAuthenticated]
 
         
