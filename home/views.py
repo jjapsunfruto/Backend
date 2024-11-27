@@ -82,33 +82,51 @@ class FamilyView(APIView):
             return Response({"message": "User is not part of any house."}, status=400)
 
         # 사용자 통계 (오늘 기준)
-        today_completion_rate = calculate_today_completion_rate(user)
-        user_completion_status = (
-            f"{today_completion_rate}%" if today_completion_rate > 0 else "오늘 할 일이 없어요"
-        )
+        today_tasks = Housework.objects.filter(user=user, houseworkDate=date.today())
+        if not today_tasks.exists():
+            user_today_completion_rate = "none"
+        else:
+            user_today_completion_rate = calculate_today_completion_rate(user)
+            user_today_completion_rate = f"{user_today_completion_rate}%"
+
+        # 사용자 주간 완료율 및 레벨 계산
+        user_weekly_completion_rate = calculate_weekly_completion_rate(user)
+        user_level = calculate_level(user_weekly_completion_rate)
 
         # 가족 구성원 통계 (오늘 기준)
         family_members = User.objects.filter(house=house).exclude(id=user.id)
         family_info = []
         for member in family_members:
-            member_today_completion_rate = calculate_today_completion_rate(member)
-            member_completion_status = (
-                f"{member_today_completion_rate}%" if member_today_completion_rate > 0 else "오늘 할 일이 없어요"
-            )
+            member_today_tasks = Housework.objects.filter(user=member, houseworkDate=date.today())
+            if not member_today_tasks.exists():
+                member_today_completion_rate = "none"
+            else:
+                member_today_completion_rate = calculate_today_completion_rate(member)
+                member_today_completion_rate = f"{member_today_completion_rate}%"
+
+            # 가족 구성원의 주간 완료율 및 레벨 계산
+            member_weekly_completion_rate = calculate_weekly_completion_rate(member)
+            member_level = calculate_level(member_weekly_completion_rate)
 
             family_info.append({
                 "nickname": member.nickname,
                 "character": member.userCharacter,
-                "today_completion_rate": member_completion_status,
+                "today_completion_rate": member_today_completion_rate,
+                "weekly_completion_rate": f"{member_weekly_completion_rate}%",
+                "level": member_level
             })
 
         return Response({
             "user": {
                 "nickname": user.nickname,
-                "today_completion_rate": user_completion_status,  # 오늘 기준
+                "character": user.userCharacter,
+                "today_completion_rate": user_today_completion_rate,
+                "weekly_completion_rate": f"{user_weekly_completion_rate}%",
+                "level": user_level
             },
             "family": family_info
         }, status=200)
+
 
 
 
