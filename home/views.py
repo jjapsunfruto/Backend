@@ -148,6 +148,7 @@ class DistributionView(APIView):
 
         # 구성원별 분배 비율 계산
         members = User.objects.filter(house=house)
+        total_members = members.count()
         distribution = []
         for member in members:
             member_tasks = houseworks.filter(user=member).count()
@@ -164,5 +165,6 @@ class DistributionView(APIView):
         return Response({
             "house": house.housename,
             "total_house_tasks": total_house_tasks,
+            "total_members" : total_members,
             "distribution": distribution
         }, status=200)
