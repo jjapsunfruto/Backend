@@ -137,34 +137,47 @@ class DistributionView(APIView):
         user = request.user
         house = user.house
 
-        # 달력을 기준으로 월요일 시작, 일요일 끝 계산
+        if not house:
+            return Response({"message": "User does not belong to a house."}, status=400)
+
+        # 달력을 기준으로 이번 주 월요일과 일요일 계산
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())  # 월요일
         end_of_week = start_of_week + timedelta(days=6)  # 일요일
 
-        # 일주일 기준 집안일 필터링
         houseworks = Housework.objects.filter(user__house=house, houseworkDate__range=[start_of_week, end_of_week])
         total_house_tasks = houseworks.count()
 
-        # 구성원별 분배 비율 계산
+        # 완료된 집안일 계산
+        completed_house_tasks = houseworks.filter(houseworkDone=True).count()
+        house_completion_rate = (
+            f"{int((completed_house_tasks / total_house_tasks) * 100)}%"
+            if total_house_tasks > 0 else "none"
+        )
+
+        # 구성원별 집안일 분배 계산
         members = User.objects.filter(house=house)
         total_members = members.count()
         distribution = []
         for member in members:
             member_tasks = houseworks.filter(user=member).count()
-            distribution_percentage = (
-                int((member_tasks / total_house_tasks * 100))
-                if total_house_tasks > 0 else 0
-            )
+            completed_tasks = houseworks.filter(user=member, houseworkDone=True).count()
+
+            if member_tasks == 0:
+                distribution_percentage = "none"
+            else:
+                distribution_percentage = f"{int((completed_tasks / member_tasks) * 100)}%"
+
             distribution.append({
                 "nickname": member.nickname,
                 "total_tasks": member_tasks,
-                "distribution_percentage": f"{distribution_percentage}%"
+                "distribution_percentage": distribution_percentage,
             })
 
         return Response({
             "house": house.housename,
             "total_house_tasks": total_house_tasks,
-            "total_members" : total_members,
+            "total_members": total_members,
+            "house_completion_rate": house_completion_rate,
             "distribution": distribution
         }, status=200)
