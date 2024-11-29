@@ -35,3 +35,14 @@ def check_today_tasks_done(sender, instance, **kwargs):
                     "message": notification.message,
                 }
             )
+
+@receiver(post_save, sender=Notification)
+def send_notification(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"user_{instance.receiver.id}",
+        {
+            "type": "send_notification",
+            "message": instance.message,
+        }
+    )

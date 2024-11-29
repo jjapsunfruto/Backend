@@ -18,6 +18,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '[::1]']
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'home',
     'mypage',
     'notification',
+    'authentication',
 ]
 
 SITE_ID = 1
@@ -192,5 +194,8 @@ ASGI_APPLICATION = 'KKaebiBack.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'CONFIG': {
+            "hosts": [("redis", 6379)],
+        },
     },
 }

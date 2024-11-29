@@ -1,3 +1,4 @@
+from django.utils.functional import LazyObject
 from rest_framework_simplejwt.tokens import AccessToken
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
@@ -12,7 +13,7 @@ def get_user_from_token(token):
     except Exception:
         return AnonymousUser()
 
-class JWTAuthMiddleware:
+class JWTAuthMiddlewareStack:
     def __init__(self, inner):
         self.inner = inner
 
