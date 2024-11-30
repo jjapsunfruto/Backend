@@ -7,6 +7,7 @@ WORKDIR /app
 RUN apk add --no-cache \
     mariadb-connector-c-dev \
     build-base \
+    musl-dev \
     cargo \
     rust \
     jpeg-dev \
@@ -17,6 +18,7 @@ RUN python -m pip install --upgrade pip setuptools wheel
 
 # requirements.txt 복사 및 설치
 COPY requirements.txt /app/
+RUN pip install --no-cache-dir --no-binary :all: charset-normalizer
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 애플리케이션 소스 복사
