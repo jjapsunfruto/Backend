@@ -1,46 +1,41 @@
-
 services:
-  # MySQL/MariaDB 데이터베이스를 실행하는 컨테이너를 설정
   db:
     container_name: db
-    #image: mysql:5.7        # 윈도우
-    image: mysql:8.0 # 맥북
+    image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: mysql
-    expose:
-      - 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3307:3306"
     env_file:
       - .env
     volumes:
       - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pmysql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Django 개발 서버를 실행하고, 데이터베이스와 연결하는 컨테이너를 설정
   web:
     container_name: web
-    # 현재 디렉토리에서 Dockerfile을 사용하여 이미지를 빌드
     build: .
-    # 컨테이너가 시작될 때 실행할 명령어
-    command: sh -c "python manage.py migrate --settings=KKaebi.settings.dev && python manage.py runserver 0.0.0.0:8000 --settings=KKaebi.settings.dev"
+    command: sh -c "python manage.py migrate --settings=${DJANGO_SETTINGS_MODULE} && python manage.py runserver 0.0.0.0:8000 --settings=${DJANGO_SETTINGS_MODULE}"
     environment:
-      MYSQL_ROOT_PASSWORD: mysql
-      DATABASE_NAME: mysql
-      DATABASE_USER: root
-      DATABASE_PASSWORD: mysql
-      DATABASE_PORT: 3306
-      DATABASE_HOST: db
-      DJANGO_SETTINGS_MODULE: KKaebi.settings.dev
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
     restart: always
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-    depends_on: # db 서비스에 의존성 - 데이터베이스 준비된 후에 시작
+    depends_on:
       - db
 
 volumes:
-  app:
   dbdata:
