@@ -23,6 +23,9 @@ from django.http import JsonResponse
 def root_endpoint(request):
     return JsonResponse({"message": "Welcome to Kkaebi API!"})
 
+def health_check(request):
+    return JsonResponse({"status": "ok"}, status=200)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('User.urls')),
@@ -32,4 +35,5 @@ urlpatterns = [
     path('mypage/', include('mypage.urls')),
     path('notification/', include('notification.urls')),
     path('', root_endpoint), 
+    path('health', health_check, name='health_check'),
 ] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

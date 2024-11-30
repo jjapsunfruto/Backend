@@ -15,7 +15,9 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
 
 #ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '[::1]', 'api.kkaebi.site']
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+
 
 
 INSTALLED_APPS = [
