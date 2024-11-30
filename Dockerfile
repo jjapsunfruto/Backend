@@ -17,5 +17,7 @@ RUN pip install -r requirements.txt
 # 애플리케이션 소스 복사
 COPY . /app
 
+
+
 # 실행 명령
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
