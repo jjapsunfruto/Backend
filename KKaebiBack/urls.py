@@ -18,6 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+def root_endpoint(request):
+    return JsonResponse({"message": "Welcome to Kkaebi API!"})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +31,5 @@ urlpatterns = [
     path('home/', include('home.urls')),
     path('mypage/', include('mypage.urls')),
     path('notification/', include('notification.urls')),
+    path('', root_endpoint), 
 ] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
