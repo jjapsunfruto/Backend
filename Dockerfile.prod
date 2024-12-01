@@ -14,11 +14,12 @@ RUN apk add --no-cache \
     zlib-dev \
     libffi-dev \
     curl \
-    bash 
+    bash \
+    openssl-dev
 
 # Rust 도구 체인 설치
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --profile minimal && \
-    export PATH="$HOME/.cargo/bin:$PATH" && \
+    . $HOME/.cargo/env && \
     rustup update && \
     rustup default stable && \
     rm -rf /var/cache/apk/*
