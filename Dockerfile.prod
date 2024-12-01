@@ -12,7 +12,13 @@ RUN apk add --no-cache \
     rust \
     jpeg-dev \
     zlib-dev \
-    libffi-dev
+    libffi-dev \
+    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    source $HOME/.cargo/env && \
+    rustup update && \
+    rustup default stable && \
+    rm -rf /var/cache/apk/*
+
 
 # pip, setuptools, wheel 업데이트
 RUN python -m pip install --upgrade pip setuptools wheel
