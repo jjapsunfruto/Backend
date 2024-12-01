@@ -13,8 +13,8 @@ RUN apk add --no-cache \
     jpeg-dev \
     zlib-dev \
     libffi-dev \
-    curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-    source $HOME/.cargo/env && \
+    curl https://sh.rustup.rs -sSf | bash -s -- -y && \
+    . $HOME/.cargo/env && \
     rustup update && \
     rustup default stable && \
     rm -rf /var/cache/apk/*
