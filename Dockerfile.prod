@@ -1,5 +1,5 @@
 # 첫 번째 스테이지: 빌드 환경
-FROM rust:1.83.0-alpine as builder
+FROM rust:1.83-alpine as builder
 
 # 작업 디렉토리 생성
 WORKDIR /app
