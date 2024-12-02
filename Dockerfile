@@ -8,20 +8,16 @@ RUN apk add --no-cache \
     mariadb-connector-c-dev \
     build-base \
     musl-dev \
-    cargo \
-    rust \
+    libffi-dev \
     jpeg-dev \
     zlib-dev \
-    libffi-dev \
+    bash \
     curl \
-    bash
+    cargo
 
-# 기존 Rust 제거 (새로운 설치를 위해)
-RUN apk del rust
-
-# Rust 설치
+# Rust 설정 및 업데이트
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --profile minimal && \
-    . $HOME/.cargo/env && \
+    source $HOME/.cargo/env && \
     rustup update && \
     rustup default stable && \
     rm -rf /var/cache/apk/*
