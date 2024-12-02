@@ -9,18 +9,18 @@ RUN apk add --no-cache \
     build-base \
     musl-dev \
     libffi-dev \
+    pkgconfig \
     jpeg-dev \
     zlib-dev \
     bash \
     curl \
     cargo
 
-# Rust 설정 및 업데이트
+# Rust 설치 및 업데이트
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --profile minimal && \
     source $HOME/.cargo/env && \
     rustup update && \
-    rustup default stable && \
-    rm -rf /var/cache/apk/*
+    rustup default stable
 
 # pip, setuptools, wheel 업데이트
 RUN python -m pip install --upgrade pip setuptools wheel
