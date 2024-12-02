@@ -39,3 +39,10 @@ services:
 
 volumes:
   dbdata:
+
+
+nginx:
+  container_name: nginx
+  build: ./config/nginx
+  depends_on:
+    - web
