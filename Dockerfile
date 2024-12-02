@@ -3,7 +3,7 @@ FROM python:3.8.3-alpine
 # 작업 디렉토리 생성
 WORKDIR /app
 
-# 필요한 패키지 설치
+# 필수 패키지 설치
 RUN apk add --no-cache \
     mariadb-connector-c-dev \
     build-base \
@@ -12,9 +12,11 @@ RUN apk add --no-cache \
     pkgconfig \
     jpeg-dev \
     zlib-dev \
-    bash \
     curl \
-    cargo
+    bash \
+    cargo \
+    rust \
+    gcc
 
 # Rust 설치 및 업데이트
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --profile minimal && \
