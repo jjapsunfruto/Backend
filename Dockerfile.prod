@@ -6,6 +6,7 @@ WORKDIR /app
 # 필요한 시스템 패키지 설치
 RUN apt-get update && apt-get install -y \
     mariadb-client \
+    mariadb-dev \
     build-essential \
     libssl-dev \
     libffi-dev \
