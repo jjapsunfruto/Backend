@@ -18,6 +18,7 @@ RUN apk add --no-cache \
 
 # pip, setuptools, wheel 업데이트
 RUN python -m pip install --upgrade pip setuptools wheel
+RUN pip install maturin
 
 # requirements.txt 복사
 COPY requirements.txt /app/
