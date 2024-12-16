@@ -11,7 +11,11 @@ RUN apk add --no-cache \
     cargo \
     rust \
     jpeg-dev \
-    zlib-dev
+    zlib-dev \
+    build-essential \
+    libffi-dev \
+    python3-dev \
+    gcc \
 
 # pip, setuptools, wheel 업데이트
 RUN python -m pip install --upgrade pip setuptools wheel
