@@ -18,8 +18,8 @@ DEBUG = env('DEBUG')
 
 #ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
-
+#ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = ['*'] 
 print("DEBUG:", DEBUG)
 print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
