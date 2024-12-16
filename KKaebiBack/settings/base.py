@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
 
     #websocket
-    'channels',
+    #'channels',
 
     # providers
     'allauth.socialaccount.providers.kakao',  
@@ -198,13 +198,14 @@ KAKAO_CLIENT_ID =  env('KAKAO_CLIENT_ID')
 KAKAO_SECRET = env('KAKAO_SECRET')
 KAKAO_BASE_URL = env('KAKAO_BASE_URL')
 
+
 #Websocket
-ASGI_APPLICATION = 'KKaebiBack.asgi.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        'CONFIG': {
-            "hosts": [("redis", 6379)],
-        },
-    },
-}
+#ASGI_APPLICATION = 'KKaebiBack.asgi.application'
+#CHANNEL_LAYERS = {
+#    'default': {
+#        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#        'CONFIG': {
+#            "hosts": [("redis", 6379)],
+#        },
+#    },
+#}
