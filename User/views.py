@@ -118,79 +118,94 @@ class HouseworkTagCreateView(views.APIView):
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
 
-class KakaoLoginView(views.APIView):
-    def get(self, request):
-        client_id = os.environ.get('KAKAO_CLIENT_ID')
-        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
-        return redirect(
-            f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
-        )
 
-class KakaoLoginCallbackView(views.APIView):
+class KakaoLoginView(APIView):
+    def get(self, request):
+        try:
+            client_id = os.environ.get('KAKAO_CLIENT_ID')
+            if not client_id:
+                return Response({"message": "KAKAO_CLIENT_ID 오류"}, status=400)
+
+            redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+            return redirect(
+                f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
+            )
+
+        except Exception as e:
+            return Response({"message": f"error: {str(e)}"}, status=500)
+
+
+class KakaoLoginCallbackView(APIView):
     SECRET_KEY = os.environ.get('KAKAO_SECRET')
 
     def get(self, request):
         code = request.GET.get("code")
         if not code:
-            return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
+            return Response({"message": "code 없음"}, status=400)
 
         return_URL = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
-        query_params = urlencode({"code":code})
+        query_params = urlencode({"code": code})
         return redirect(f"{return_URL}?{query_params}")
 
 class KakaoUserInfoView(APIView):
     def post(self, request):
         code = request.data.get("code")
         if not code:
-            return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
+            return Response({"message": "code 없음"}, status=400)
 
         client_id = os.environ.get('KAKAO_CLIENT_ID')
+        if not client_id:
+            return Response({"message": "KAKAO_CLIENT_ID 오류"}, status=400)
+
         redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
 
-        token_request = requests.get(
-            f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
-        )
+        try:
+            token_request = requests.get(
+                f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
+            )
+            token_json = token_request.json()
+            logging.info(f"Kakao token response: {token_json}")
 
-        token_json = token_request.json()
-        logging.info(f"Kakao token response: {token_json}")
+            if token_request.status_code != 200 or "access_token" not in token_json:
+                return Response({"message": "유효하지 않은 코드입니다."}, status=400)
 
-        if token_request.status_code != 200 or "access_token" not in token_json:
-            return Response({"message": "유효하지 않은 코드입니다."}, status=400)
+            access_token = token_json["access_token"]
 
-        access_token = token_json["access_token"]
+            profile_request = requests.get(
+                "https://kapi.kakao.com/v2/user/me",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            profile_json = profile_request.json()
+            logging.info(f"Kakao profile response: {profile_json}")
 
-        profile_request = requests.get(
-            "https://kapi.kakao.com/v2/user/me",
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
+            if profile_request.status_code != 200:
+                return Response({"message": "사용자 프로필 요청 실패", "error": profile_json}, status=400)
 
-        profile_json = profile_request.json()
-        logging.info(f"Kakao profile response: {profile_json}")
+            kakao_account = profile_json.get("kakao_account")
+            if kakao_account is None:
+                return Response({"message": "Kakao 계정 정보가 없습니다."}, status=400)
 
-        if profile_request.status_code != 200:
-            return Response({"message": "사용자 프로필 요청 실패", "error": profile_json}, status=400)
+            nickname = kakao_account.get("profile", {}).get("nickname")
+            user_id = profile_json.get("id")
 
-        kakao_account = profile_json.get("kakao_account")
-        if kakao_account is None:
-            return Response({"message": "Kakao 계정 정보가 없습니다."}, status=400)
+            if not nickname or not user_id:
+                return Response({"message": "Kakao 계정 정보가 부족합니다.", "kakao_account": kakao_account, "profile_json": profile_json}, status=400)
 
-        nickname = kakao_account.get("profile", {}).get("nickname")
-        id = profile_json.get("id")
+            user, created = User.objects.get_or_create(
+                id=user_id,
+                defaults={'nickname': nickname}
+            )
 
-        if not nickname or not id:
-            return Response({"message": "Kakao 계정 정보가 부족합니다.", "kakao_account": kakao_account, "profile_json": profile_json}, status=400)
+            token = AccessToken.for_user(user)
+            
+            return Response({
+                "user": {
+                    "id": user.id,
+                    "nickname": user.nickname,
+                },
+                "token": str(token),
+            }, status=200)
 
-        user, created = User.objects.get_or_create(
-            id=id,
-            defaults={'nickname': nickname}
-        )
-
-        token = AccessToken.for_user(user)
-        
-        return Response({
-            "user": {
-                "id": user.id,
-                "nickname": user.nickname,
-            },
-            "token": str(token),
-        }, status=200)
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Kakao API 요청 오류: {e}")
+            return Response({"message": "카카오 API 요청 중 오류가 발생했습니다."}, status=500)
