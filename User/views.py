@@ -135,7 +135,8 @@ class KakaoLoginCallbackView(views.APIView):
             return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
 
         client_id = os.environ.get('KAKAO_CLIENT_ID')
-        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+        #redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+        #redirect_uri = f"http://localhost:3000/accounts/kakao/callback"
 
         token_request = requests.get(
             f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
