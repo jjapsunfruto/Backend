@@ -128,7 +128,7 @@ class KakaoLoginView(views.APIView):
             if not KAKAO_BASE_URL:
                 return Response({"message": "KAKAO_BASE_URL 오류"}, status=400)
 
-            redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+            redirect_uri = f"{KAKAO_BASE_URL}user/login/kakao/callback/"
 
             return redirect(
                 f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
@@ -147,7 +147,7 @@ class KakaoLoginCallbackView(views.APIView):
         if not code:
             return Response({"message": "code 없음"}, status=400)
 
-        return_URL = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+        return_URL = f"{KAKAO_BASE_URL}user/login/kakao/callback/"
         query_params = urlencode({"code": code})
         return redirect(f"{return_URL}?{query_params}")
 
@@ -161,7 +161,7 @@ class KakaoUserInfoView(views.APIView):
         if not client_id:
             return Response({"message": "KAKAO_CLIENT_ID 오류"}, status=400)
 
-        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+        redirect_uri = f"{KAKAO_BASE_URL}user/login/kakao/callback/"
 
         try:
             token_request = requests.get(
