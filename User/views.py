@@ -136,7 +136,7 @@ class KakaoLoginCallbackView(views.APIView):
 
         client_id = os.environ.get('KAKAO_CLIENT_ID')
         #redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
-        #redirect_uri = f"http://localhost:3000/accounts/kakao/callback"
+        redirect_uri = f"http://localhost:3000/accounts/kakao/callback"
 
         token_request = requests.get(
             f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
