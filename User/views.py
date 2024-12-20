@@ -128,7 +128,7 @@ class KakaoLoginView(views.APIView):
             if not KAKAO_BASE_URL:
                 return Response({"message": "KAKAO_BASE_URL 오류"}, status=400)
 
-            redirect_uri = f"{kakao_base_url}/user/login/kakao/callback/"
+            redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
 
             return redirect(
                 f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
