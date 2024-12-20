@@ -117,6 +117,7 @@ class HouseworkTagCreateView(views.APIView):
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
+FRONT_BASE_URL = "http://localhost:3000"
 
 class KakaoLoginView(views.APIView):
     def get(self, request):
@@ -134,9 +135,18 @@ class KakaoLoginCallbackView(views.APIView):
         if not code:
             return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
 
+        return_URL = f"{FRONT_BASE_URL}/user/login/kakao/callback/"
+        query_params = urlencode({"code":code})
+        return redirect(f"{return_URL}?{query_params}")
+
+class KakaoUserInfoView(APIView):
+    def post(self, request):
+        code = request.data.get("code")
+        if not code:
+            return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
+
         client_id = os.environ.get('KAKAO_CLIENT_ID')
-        #redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
-        redirect_uri = f"http://localhost:3000/signupintro"
+        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
 
         token_request = requests.get(
             f"{KAKAO_URL}/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}"
@@ -177,10 +187,11 @@ class KakaoLoginCallbackView(views.APIView):
         )
 
         token = AccessToken.for_user(user)
-
+        
         return Response({
             "user": {
-            "id": user.id,
-            "nickname": user.nickname
+                "id": user.id,
+                "nickname": user.nickname,
             },
-            "token": str(token)}, status=200)
+            "token": str(token),
+        }, status=200)
