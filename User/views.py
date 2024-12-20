@@ -132,7 +132,7 @@ class KakaoLoginCallbackView(views.APIView):
     def get(self, request):
         code = request.GET.get("code")
         if not code:
-            return JsonResponse({"message": "코드가 제공되지 않았습니다."}, status=400)
+            return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
 
         client_id = os.environ.get('KAKAO_CLIENT_ID')
         redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
@@ -145,7 +145,7 @@ class KakaoLoginCallbackView(views.APIView):
         logging.info(f"Kakao token response: {token_json}")
 
         if token_request.status_code != 200 or "access_token" not in token_json:
-            return JsonResponse({"message": "유효하지 않은 코드입니다."}, status=400)
+            return Response({"message": "유효하지 않은 코드입니다."}, status=400)
 
         access_token = token_json["access_token"]
 
@@ -158,17 +158,17 @@ class KakaoLoginCallbackView(views.APIView):
         logging.info(f"Kakao profile response: {profile_json}")
 
         if profile_request.status_code != 200:
-            return JsonResponse({"message": "사용자 프로필 요청 실패", "error": profile_json}, status=400)
+            return Response({"message": "사용자 프로필 요청 실패", "error": profile_json}, status=400)
 
         kakao_account = profile_json.get("kakao_account")
         if kakao_account is None:
-            return JsonResponse({"message": "Kakao 계정 정보가 없습니다."}, status=400)
+            return Response({"message": "Kakao 계정 정보가 없습니다."}, status=400)
 
         nickname = kakao_account.get("profile", {}).get("nickname")
         id = profile_json.get("id")
 
         if not nickname or not id:
-            return JsonResponse({"message": "Kakao 계정 정보가 부족합니다.", "kakao_account": kakao_account, "profile_json": profile_json}, status=400)
+            return Response({"message": "Kakao 계정 정보가 부족합니다.", "kakao_account": kakao_account, "profile_json": profile_json}, status=400)
 
         user, created = User.objects.get_or_create(
             id=id,
@@ -177,7 +177,7 @@ class KakaoLoginCallbackView(views.APIView):
 
         token = AccessToken.for_user(user)
 
-        return JsonResponse({
+        return Response({
             "user": {
             "id": user.id,
             "nickname": user.nickname
