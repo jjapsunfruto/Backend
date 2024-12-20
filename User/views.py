@@ -122,7 +122,7 @@ FRONT_BASE_URL = "http://localhost:3000"
 class KakaoLoginView(views.APIView):
     def get(self, request):
         client_id = os.environ.get('KAKAO_CLIENT_ID')
-        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+        redirect_uri = f"{FRONT_BASE_URL}/user/login/kakao/callback/"
         return redirect(
             f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
         )
