@@ -118,7 +118,6 @@ class HouseworkTagCreateView(views.APIView):
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
 
-
 class KakaoLoginView(APIView):
     def get(self, request):
         try:
@@ -126,13 +125,18 @@ class KakaoLoginView(APIView):
             if not client_id:
                 return Response({"message": "KAKAO_CLIENT_ID 오류"}, status=400)
 
-            redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
+            if not KAKAO_BASE_URL:
+                return Response({"message": "KAKAO_BASE_URL 오류"}, status=400)
+
+            redirect_uri = f"{kakao_base_url}/user/login/kakao/callback/"
+
             return redirect(
                 f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
             )
-
+        
         except Exception as e:
-            return Response({"message": f"error: {str(e)}"}, status=500)
+            logging.error(f"Kakao 로그인 리다이렉트 중 오류 발생: {str(e)}")
+            return Response({"message": f"서버 오류: {str(e)}"}, status=500)
 
 
 class KakaoLoginCallbackView(APIView):
