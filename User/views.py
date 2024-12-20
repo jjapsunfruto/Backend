@@ -117,12 +117,11 @@ class HouseworkTagCreateView(views.APIView):
 
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
-FRONT_BASE_URL = "http://localhost:3000"
 
 class KakaoLoginView(views.APIView):
     def get(self, request):
         client_id = os.environ.get('KAKAO_CLIENT_ID')
-        redirect_uri = f"{FRONT_BASE_URL}/user/login/kakao/callback/"
+        redirect_uri = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
         return redirect(
             f"{KAKAO_URL}/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
         )
@@ -135,7 +134,7 @@ class KakaoLoginCallbackView(views.APIView):
         if not code:
             return Response({"message": "코드가 제공되지 않았습니다."}, status=400)
 
-        return_URL = f"{FRONT_BASE_URL}/user/login/kakao/callback/"
+        return_URL = f"{KAKAO_BASE_URL}/user/login/kakao/callback/"
         query_params = urlencode({"code":code})
         return redirect(f"{return_URL}?{query_params}")
 
