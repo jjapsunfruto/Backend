@@ -118,7 +118,7 @@ class HouseworkTagCreateView(views.APIView):
 KAKAO_BASE_URL = os.environ.get("KAKAO_BASE_URL")
 KAKAO_URL = "https://kauth.kakao.com/oauth"
 
-class KakaoLoginView(APIView):
+class KakaoLoginView(views.APIView):
     def get(self, request):
         try:
             client_id = os.environ.get('KAKAO_CLIENT_ID')
@@ -139,7 +139,7 @@ class KakaoLoginView(APIView):
             return Response({"message": f"서버 오류: {str(e)}"}, status=500)
 
 
-class KakaoLoginCallbackView(APIView):
+class KakaoLoginCallbackView(views.APIView):
     SECRET_KEY = os.environ.get('KAKAO_SECRET')
 
     def get(self, request):
@@ -151,7 +151,7 @@ class KakaoLoginCallbackView(APIView):
         query_params = urlencode({"code": code})
         return redirect(f"{return_URL}?{query_params}")
 
-class KakaoUserInfoView(APIView):
+class KakaoUserInfoView(views.APIView):
     def post(self, request):
         code = request.data.get("code")
         if not code:
