@@ -2,8 +2,11 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import environ
-import pymysql
-pymysql.install_as_MySQLdb()
+
+
+#import pymysql
+#pymysql.install_as_MySQLdb()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,13 +18,14 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED')
 
 #ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
-
+#ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = ['*'] 
 print("DEBUG:", DEBUG)
-print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS) 
 
 
 
@@ -73,7 +77,7 @@ REST_FRAMEWORK = {
 }
 REST_USE_JWT = True
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -191,6 +195,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 KAKAO_CLIENT_ID =  env('KAKAO_CLIENT_ID')
 KAKAO_SECRET = env('KAKAO_SECRET')
 KAKAO_BASE_URL = env('KAKAO_BASE_URL')
+
 
 #Websocket
 ASGI_APPLICATION = 'KKaebiBack.asgi.application'
